@@ -110,5 +110,33 @@ fi
 echo -e "ismael\nismael" | sudo htpasswd -i /etc/nginx/.htpasswd ismael
 echo -e "manzano\nmanzano" | sudo htpasswd -i /etc/nginx/.htpasswd manzano
 
+
+# Agregar archivo de configuracion example.com
+sudo cp /vagrant/example.com /etc/nginx/sites-available/example.com
+
+# Crear enlace simbólico si no existe
+if [ ! -L /etc/nginx/sites-enabled/example.com ]; then
+    sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+fi
+
+# Generar el certificado autofirmado si no existe
+if [ ! -f /etc/ssl/certs/example.com.crt ]; then
+    echo "Generando certificado autofirmado para example.com..."
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/example.com.key \
+    -out /etc/ssl/certs/example.com.crt \
+    -subj "/C=ES/ST=Granada/L=Granada/O=WEB/OU=WEB/CN=example.com/emailAddress=webmaster@example.com"
+fi
+
 # Reinicar nginx
 sudo systemctl restart nginx
+
+# Instalacion del cortafuegos
+sudo apt install ufw
+# Habilitar el cortafuegos
+sudo ufw allow ssh
+# Eliminacion de reglas
+sudo ufw delete allow 'Nginx HTTP'
+# Activar el cortafuegos 
+sudo ufw --force enable
+

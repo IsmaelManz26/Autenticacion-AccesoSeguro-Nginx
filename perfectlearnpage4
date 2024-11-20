@@ -1,0 +1,14 @@
+server {
+    listen 80;
+    listen [::]:80;
+    root /var/www/perfectlearn;
+    index index.html index.htm index.nginx-debian.html;
+    server_name perfectlearnpage;
+    
+     location / {
+        deny 192.168.56.1;  # Bloquea la IP de la máquina anfitriona
+        allow all;
+        try_files $uri $uri/ =404;
+    }
+
+}
